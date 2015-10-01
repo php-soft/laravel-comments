@@ -1,31 +1,39 @@
 {
-    "name": "laravel/laravel",
+    "name": "php-soft/laravel-comments",
     "description": "The Laravel Framework.",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "type": "project",
     "require": {
         "php": ">=5.5.9",
-        "laravel/framework": "5.1.*"
+        "laravel/framework": "5.1.*",
+        "php-soft/laravel-array-view": "1.1.x",
+        "doctrine/dbal": "^2.5"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "~4.0",
-        "phpspec/phpspec": "~2.1"
+        "phpspec/phpspec": "~2.1",
+        "squizlabs/php_codesniffer": "1.4.*@stable",
+        "phpmd/phpmd": "2.2.*"
     },
     "autoload": {
         "classmap": [
-            "database"
+            "packages/Comments/database"
         ],
         "psr-4": {
-            "App\\": "app/"
+            "PhpSoft\\Comments\\": "packages/Comments"
         }
     },
     "autoload-dev": {
         "classmap": [
+            "database",
             "tests/TestCase.php"
-        ]
+        ],
+        "psr-4": {
+            "App\\": "app/"
+        }
     },
     "scripts": {
         "post-install-cmd": [
