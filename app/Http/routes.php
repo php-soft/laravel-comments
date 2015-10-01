@@ -14,3 +14,5 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::post('/comments', '\PhpSoft\Comments\Controllers\CommentController@store');
