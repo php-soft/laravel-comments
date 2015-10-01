@@ -1,14 +1,13 @@
 <?php
-use Illuminate\Foundation\Testing\WithoutMiddleware;
 
 class CommentControllerTest extends TestCase
 {
-    use WithoutMiddleware;
-
     public function testCreateValidateFailure()
     {
+
+        $user = factory(App\User::class)->create();
         $res = $this->call('POST', '/comments');
-        dump(123);
+        dump($res->getStatuscode());
     }
 
 }

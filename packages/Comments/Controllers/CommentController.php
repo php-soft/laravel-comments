@@ -5,7 +5,7 @@ namespace PhpSoft\Comments\Controllers;
 use Input;
 use Illuminate\Http\Request;
 use Validator;
-
+use Auth;
 use App\Http\Requests;
 use App\User;
 use PhpSoft\Comments\Models\Comment;
@@ -15,7 +15,7 @@ class CommentController extends Controller
 {
     public function store()
     {
-        dump('abc');
+        return "Nguyen Hoang Vu";
     }
 
 }
