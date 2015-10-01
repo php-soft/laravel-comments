@@ -145,6 +145,9 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        PhpSoft\ArrayView\Providers\ArrayViewServiceProvider::class,
+        PhpSoft\Comments\Providers\CommentServiceProvider::class,
+
     ],
 
     /*
