@@ -1,5 +1,7 @@
 # Laravel Comments Module
 
+[![Build Status](https://travis-ci.org/php-soft/laravel-comments.svg)](https://travis-ci.org/php-soft/laravel-comments)
+
 > This is RESTful APIs
 
 ## 1. Installation
