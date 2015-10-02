@@ -57,9 +57,7 @@ class CommentController extends Controller
         }
 
         // check self comment
-        $userCommentID = $comment->user_id;
-
-        if ($userCommentID != Auth::user()->id) {
+        if ($comment->user_id != Auth::user()->id) {
             return response()->json(null, 403);
         }
 
