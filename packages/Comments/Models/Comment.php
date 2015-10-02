@@ -47,4 +47,19 @@ class Comment extends Model
         $comment->save();
         return $comment;
     }
+
+    /**
+     * Update the model in the database.
+     *
+     * @param  array  $attributes
+     * @return bool|int
+     */
+    public function update(array $attributes = [])
+    {
+        if (!parent::update($attributes)) {
+            throw new Exception('Cannot update category.'); // @codeCoverageIgnore
+        }
+
+        return $this->fresh();
+    }
 }

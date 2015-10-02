@@ -1,5 +1,7 @@
 <?php
 
+use PhpSoft\Comments\Models\Comment;
+
 class CommentControllerTest extends TestCase
 {
     public function testCreateValidateFailure()
@@ -52,5 +54,81 @@ class CommentControllerTest extends TestCase
         $this->assertEquals('http://pm.greenglobal.vn/post1', $results->entities[0]->url);
         $this->assertEquals('demo comment', $results->entities[0]->content);
         $this->assertEquals(Auth::user()->id, $results->entities[0]->user_id);
+    }
+
+    public function testUpdateNotExists()
+    {
+        $user = factory(App\User::class)->create();
+        Auth::login($user);
+
+        $res = $this->call('PATCH', '/comments/5');
+        $this->assertEquals(404, $res->getStatusCode());
+    }
+
+    public function testUpdateValidateFailure()
+    {
+        // test not login
+        $res = $this->call('POST', '/comments');
+
+        $this->assertEquals(401, $res->getStatuscode());
+
+        //check not self comment
+        $user1 = factory(App\User::class)->create();
+        $user2 = factory(App\User::class)->create();
+        Auth::login($user1);
+
+        $comment = factory(Comment::class)->create(['user_id' => $user2->id]);
+        $res = $this->call('PATCH', '/comments/' . $comment->id, [
+            'content'  => 'comment of user2',
+        ]);
+
+        $this->assertEquals(403, $res->getStatuscode());
+
+        // test input invalid
+        $comment = factory(Comment::class)->create(['user_id' => $user1->id]); 
+
+        $res = $this->call('PATCH', '/comments/' . $comment->id, [
+            'content'  => '',
+        ]);
+
+        $this->assertEquals(400, $res->getStatusCode());
+        $results = json_decode($res->getContent());
+        $this->assertEquals('error', $results->status);
+        $this->assertEquals('validation', $results->type);
+        $this->assertObjectHasAttribute('content', $results->errors);
+        $this->assertEquals('The content field is required.', $results->errors->content[0]);
+        $this->assertEquals('The content field is required.', $results->message);
+    }
+
+    public function testUpdateNothingChange()
+    {
+        $user = factory(App\User::class)->create();
+        Auth::login($user);
+
+        $comment = factory(Comment::class)->create(['user_id' => $user->id]);
+
+        $res = $this->call('PATCH', '/comments/' . $comment->id);
+        $this->assertEquals(200, $res->getStatusCode());
+        $results = json_decode($res->getContent());
+        $this->assertEquals($comment->content, $results->entities[0]->content);
+        $this->assertEquals($comment->url, $results->entities[0]->url);
+        $this->assertEquals($comment->user_id, $results->entities[0]->user_id);
+    }
+
+    public function testUpdateWithNewInformation()
+    {
+        $user = factory(App\User::class)->create();
+        Auth::login($user);
+        $comment = factory(Comment::class)->create(['user_id' => $user->id]);
+
+        $res = $this->call('PATCH', '/comments/' . $comment->id, [
+            'content'  => 'new comment',
+        ]);
+
+        $this->assertEquals(200, $res->getStatusCode());
+        $results = json_decode($res->getContent());
+        $this->assertEquals('new comment', $results->entities[0]->content);
+        $this->assertEquals($comment->url, $results->entities[0]->url);
+        $this->assertEquals($comment->user_id, $results->entities[0]->user_id);
     }
 }

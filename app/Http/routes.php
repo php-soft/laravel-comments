@@ -18,4 +18,5 @@ Route::get('/', function () {
 Route::group(['middleware'=>'auth'], function() {
 
     Route::post('/comments', '\PhpSoft\Comments\Controllers\CommentController@store');
+    Route::patch('/comments/{id}', '\PhpSoft\Comments\Controllers\CommentController@update');
 });

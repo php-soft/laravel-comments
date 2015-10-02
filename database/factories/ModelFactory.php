@@ -19,3 +19,10 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
         'remember_token' => str_random(10),
     ];
 });
+
+$factory->define(PhpSoft\Comments\Models\Comment::class, function (Faker\Generator $faker) {
+    return [
+        'url' => 'http://pm.greenglobal.vn/post1',
+        'content' => 'demo comment of user 1'
+    ];
+});
