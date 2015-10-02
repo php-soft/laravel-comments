@@ -78,4 +78,32 @@ class CommentController extends Controller
             'comment' => $comment
         ]), 200);
     }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function destroy($id)
+    {
+        // retrieve category
+        $comment = Comment::find($id);
+
+        // check exists
+        if (empty($comment)) {
+            return response()->json(null, 404);
+        }
+
+        // check self comment
+        if ($comment->user_id != Auth::user()->id) {
+            return response()->json(null, 403);
+        }
+
+        if (!$comment->delete()) {
+            return response()->json(null, 500); // @codeCoverageIgnore
+        }
+
+        return response()->json(null, 204);
+    }
 }

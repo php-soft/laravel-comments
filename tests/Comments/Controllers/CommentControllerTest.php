@@ -131,4 +131,44 @@ class CommentControllerTest extends TestCase
         $this->assertEquals($comment->url, $results->entities[0]->url);
         $this->assertEquals($comment->user_id, $results->entities[0]->user_id);
     }
+
+    public function testDeleteNotFound()
+    {
+        $user = factory(App\User::class)->create();
+        Auth::login($user);
+
+        $res = $this->call('DELETE', '/comments/1');
+        $this->assertEquals(404, $res->getStatusCode());
+    }
+
+    public function testDeleteFailure()
+    {
+        // test not login
+        $res = $this->call('DELETE', '/comments/1');
+
+        $this->assertEquals(401, $res->getStatuscode());
+
+        //check not self comment
+        $user1 = factory(App\User::class)->create();
+        $user2 = factory(App\User::class)->create();
+        Auth::login($user1);
+
+        $comment = factory(Comment::class)->create(['user_id' => $user2->id]);
+        $res = $this->call('DELETE', '/comments/' . $comment->id);
+
+        $this->assertEquals(403, $res->getStatuscode());
+    }
+
+    public function testDeleteSuccess()
+    {
+        $user = factory(App\User::class)->create();
+        Auth::login($user);
+        $comment = factory(Comment::class)->create(['user_id' => $user->id]);
+
+        $res = $this->call('DELETE', "/comments/{$comment->id}");
+        $this->assertEquals(204, $res->getStatusCode());
+
+        $exists = Comment::find($comment->id);
+        $this->assertNull($exists);
+    }
 }

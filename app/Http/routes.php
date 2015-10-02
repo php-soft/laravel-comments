@@ -19,4 +19,5 @@ Route::group(['middleware'=>'auth'], function() {
 
     Route::post('/comments', '\PhpSoft\Comments\Controllers\CommentController@store');
     Route::patch('/comments/{id}', '\PhpSoft\Comments\Controllers\CommentController@update');
+    Route::delete('/comments/{id}', '\PhpSoft\Comments\Controllers\CommentController@destroy');
 });
