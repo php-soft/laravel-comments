@@ -5,12 +5,9 @@ namespace PhpSoft\Comments\Models;
 use Auth;
 use Illuminate\Database\Eloquent\Exception;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Comment extends Model
 {
-    use SoftDeletes;
-
     /**
      * The database table used by the model.
      *
@@ -46,5 +43,20 @@ class Comment extends Model
         $comment->user_id = Auth::user()->id;
         $comment->save();
         return $comment;
+    }
+
+    /**
+     * Update the model in the database.
+     *
+     * @param  array  $attributes
+     * @return bool|int
+     */
+    public function update(array $attributes = [])
+    {
+        if (!parent::update($attributes)) {
+            throw new Exception('Cannot update category.'); // @codeCoverageIgnore
+        }
+
+        return $this->fresh();
     }
 }
