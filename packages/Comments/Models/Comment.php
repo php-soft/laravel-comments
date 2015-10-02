@@ -5,12 +5,9 @@ namespace PhpSoft\Comments\Models;
 use Auth;
 use Illuminate\Database\Eloquent\Exception;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Comment extends Model
 {
-    use SoftDeletes;
-
     /**
      * The database table used by the model.
      *
