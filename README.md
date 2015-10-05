@@ -49,6 +49,7 @@ Add routes in `app/Http/routes.php`
 ```php
 Route::group(['middleware'=>'auth'], function() {
 
+    Route::get('/comments/{url}', '\PhpSoft\Comments\Controllers\CommentController@index')->where('url', '.*');
     Route::post('/comments', '\PhpSoft\Comments\Controllers\CommentController@store');
     Route::patch('/comments/{id}', '\PhpSoft\Comments\Controllers\CommentController@update');
     Route::delete('/comments/{id}', '\PhpSoft\Comments\Controllers\CommentController@destroy');

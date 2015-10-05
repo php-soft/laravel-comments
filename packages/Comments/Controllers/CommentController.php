@@ -106,4 +106,23 @@ class CommentController extends Controller
 
         return response()->json(null, 204);
     }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function index($url)
+    {
+        $comments = Comment::browse([
+            'limit'     => ($limit = (int)Input::get('limit', 25)),
+            'cursor'    => Input::get('cursor'),
+            'offset'    => (Input::get('page', 1) - 1) * $limit,
+            'url'      => $url,
+        ]);
+
+        return response()->json(arrayView('phpsoft.comments::comment/browse', [
+            'comments' => $comments,
+        ]), 200);
+    }
 }
