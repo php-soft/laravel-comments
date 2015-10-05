@@ -59,4 +59,37 @@ class Comment extends Model
 
         return $this->fresh();
     }
+
+    /**
+     * Browse items
+     * 
+     * @param  array  $options
+     * @return array
+     */
+    public static function browse($options = [])
+    {
+        $find = new Comment();
+        $find = $find->where('url', $options['url'])->orderBy('id', 'DESC');
+
+        $total = $find->count();
+
+        if (!empty($options['offset'])) {
+            $find = $find->skip($options['offset']);
+        }
+
+        if (!empty($options['limit'])) {
+            $find = $find->take($options['limit']);
+        }
+
+        if (!empty($options['cursor'])) {
+            $find = $find->where('id', '<', $options['cursor']);
+        }
+
+        return [
+            'total'  => $total,
+            'offset' => empty($options['offset']) ? 0 : $options['offset'],
+            'limit'  => empty($options['limit']) ? 0 : $options['limit'],
+            'data'   => $find->get(),
+        ];
+    }
 }

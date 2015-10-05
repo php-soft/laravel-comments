@@ -171,4 +171,136 @@ class CommentControllerTest extends TestCase
         $exists = Comment::find($comment->id);
         $this->assertNull($exists);
     }
+
+    public function testBrowseNotFound()
+    {
+        // test not login
+        $urlencode = urlencode('http://pm.greenglobal.vn/post1'); 
+        $res = $this->call('GET', "/comments/$urlencode");
+
+        $this->assertEquals(401, $res->getStatuscode());
+
+        // test no record
+        $user = factory(App\User::class)->create();
+        Auth::login($user);
+
+        $urlencode = urlencode('http://pm.greenglobal.vn/post1'); 
+        $removeAllComments = Comment::truncate();
+        $res = $this->call('GET', "/comments/$urlencode"); 
+        $this->assertEquals(200, $res->getStatusCode());
+        $results = json_decode($res->getContent());
+        $this->assertEquals(0, count($results->entities));
+
+        // test url no match
+        for ($i = 0; $i < 10; ++$i) {
+            $comments[] = factory(Comment::class)->create(['url' => 'http://pm.greenglobal.vn/1', 'user_id' => '1' ]);
+        }
+        $urlencode = urlencode('http://pm.greenglobal.vn/2');
+        $res = $this->call('GET', "/comments/$urlencode");
+        $this->assertEquals(200, $res->getStatusCode());
+        $results = json_decode($res->getContent());
+        $this->assertEquals(0, count($results->entities));
+    }
+
+    public function testBrowseFound()
+    {
+        $user = factory(App\User::class)->create();
+        Auth::login($user);
+        $urlencode = urlencode('http://pm.greenglobal.vn/1');
+
+        $comments = [];
+        for ($i = 0; $i <= 10; ++$i) {
+            $comments[] = factory(Comment::class)->create(['url' => 'http://pm.greenglobal.vn/1', 'user_id' => '1' ]);
+        }
+
+        for ($i = 0; $i <= 10; ++$i) {
+            $comments2[] = factory(Comment::class)->create(['url' => 'http://pm.greenglobal.vn/2', 'user_id' => '1' ]);
+        }
+
+        $res = $this->call('GET', "/comments/$urlencode");
+        $this->assertEquals(200, $res->getStatusCode());
+        $results = json_decode($res->getContent());
+        $this->assertEquals(count($comments), count($results->entities));
+        for ($i = 0; $i <= 10; ++$i) {
+            $this->assertEquals($comments[10 - $i]->id, $results->entities[$i]->id);
+            $this->assertEquals('http://pm.greenglobal.vn/1', $results->entities[$i]->url);
+            $this->assertEquals('1', $results->entities[$i]->user_id);
+        }
+    }
+
+    public function testBrowseWithScroll()
+    {
+        $user = factory(App\User::class)->create();
+        Auth::login($user);
+        $urlencode = urlencode('http://pm.greenglobal.vn/1');
+
+        $comments = [];
+        for ($i = 0; $i <= 10; ++$i) {
+            $comments[] = factory(Comment::class)->create(['url' => 'http://pm.greenglobal.vn/1', 'user_id' => '1' ]);
+        }
+
+        // 5 items first
+        $res = $this->call('GET', "/comments/$urlencode?limit=5");
+        $this->assertEquals(200, $res->getStatusCode());
+        $results = json_decode($res->getContent());
+        $this->assertEquals(5, count($results->entities));
+        for ($i = 0; $i < 5; ++$i) {
+            $this->assertEquals($comments[10 - $i]->id, $results->entities[$i]->id);
+        }
+
+        // 5 items next
+        $nextLink = $results->links->next->href;
+        $res = $this->call('GET', $nextLink);
+        $this->assertEquals(200, $res->getStatusCode());
+        $results = json_decode($res->getContent());
+        $this->assertEquals(5, count($results->entities));
+        for ($i = 0; $i < 5; ++$i) {
+            $this->assertEquals($comments[5 - $i]->id, $results->entities[$i]->id);
+        }
+
+        // over list
+        $nextLink = $results->links->next->href;
+        $res = $this->call('GET', $nextLink);
+        $this->assertEquals(200, $res->getStatusCode());
+        $results = json_decode($res->getContent());
+        $this->assertEquals(1, count($results->entities));
+    }
+
+    public function testBrowseWithPagination()
+    {
+        $user = factory(App\User::class)->create();
+        Auth::login($user);
+        $urlencode = urlencode('http://pm.greenglobal.vn/1');
+
+        $comments = [];
+        for ($i = 0; $i <= 10; ++$i) {
+            $comments[] = factory(Comment::class)->create(['url' => 'http://pm.greenglobal.vn/1', 'user_id' => '1' ]);
+        }
+
+        // 5 items first
+        $res = $this->call('GET', "/comments/$urlencode?limit=5");
+        $this->assertEquals(200, $res->getStatusCode());
+        $results = json_decode($res->getContent());
+        $this->assertEquals(5, count($results->entities));
+        for ($i = 0; $i < 5; ++$i) {
+            $this->assertEquals($comments[10 - $i]->id, $results->entities[$i]->id);
+        }
+
+        // 5 items next
+        $nextLink = "/comments/$urlencode?limit=5&page=2";
+        $res = $this->call('GET', $nextLink);
+        $this->assertEquals(200, $res->getStatusCode());
+        $results = json_decode($res->getContent());
+        $this->assertEquals(5, count($results->entities));
+        for ($i = 0; $i < 5; ++$i) {
+            $this->assertEquals($comments[5 - $i]->id, $results->entities[$i]->id);
+        }
+
+        // over list
+        $nextLink = "/comments/$urlencode?limit=5&page=3";
+        $res = $this->call('GET', $nextLink);
+        $this->assertEquals(200, $res->getStatusCode());
+        $results = json_decode($res->getContent());
+        $this->assertEquals(1, count($results->entities));
+    }
 }
