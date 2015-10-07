@@ -7,7 +7,9 @@ class CommentControllerTest extends TestCase
     public function testCreateValidateFailure()
     {
         // test not login
-        $res = $this->call('POST', '/comments');
+        $urlencode = urlencode('http://pm.greenglobal.vn/2');
+
+        $res = $this->call('POST', "/comments/$urlencode");
 
         $this->assertEquals(401, $res->getStatuscode());
 
@@ -15,20 +17,21 @@ class CommentControllerTest extends TestCase
         $user = factory(App\User::class)->create();
         Auth::login($user);
 
-        $res = $this->call('POST', '/comments');
+        $res = $this->call('POST', "/comments/$urlencode");
         $results = json_decode($res->getContent());
         $this->assertEquals('error', $results->status);
         $this->assertEquals('validation', $results->type);
-        $this->assertObjectHasAttribute('url', $results->errors);
-        $this->assertEquals('The url field is required.', $results->errors->url[0]);
+        $this->assertObjectHasAttribute('content', $results->errors);
         $this->assertEquals('The content field is required.', $results->errors->content[0]);
-        $this->assertEquals('The url field is required.', $results->message);
+        $this->assertEquals('The content field is required.', $results->message);
 
-        // test validate invalid format input
-        $res = $this->call('POST', '/comments', [
-            'url'     => 'address comment',
+        // test validate invalid format url
+        $urlencode = urlencode('greenglobal/post/2');
+
+        $res = $this->call('POST', "/comments/$urlencode", [
             'content' => 'demo comment'
         ]);
+
 
         $results = json_decode($res->getContent());
         $this->assertEquals('error', $results->status);
@@ -42,8 +45,9 @@ class CommentControllerTest extends TestCase
         $user = factory(App\User::class)->create();
         Auth::login($user);
 
-        $res = $this->call('POST', '/comments', [
-            'url'     => 'http://pm.greenglobal.vn/post1',
+        $urlencode = urlencode('http://pm.greenglobal.vn/post1');
+
+        $res = $this->call('POST', "/comments/$urlencode", [
             'content' => 'demo comment'
         ]);
 
@@ -68,7 +72,7 @@ class CommentControllerTest extends TestCase
     public function testUpdateValidateFailure()
     {
         // test not login
-        $res = $this->call('POST', '/comments');
+        $res = $this->call('PATCH', '/comments/1');
 
         $this->assertEquals(401, $res->getStatuscode());
 
