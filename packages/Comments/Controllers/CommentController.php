@@ -20,9 +20,12 @@ class CommentController extends Controller
      * @param  Request $request
      * @return Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $url)
     {
-        $validator = Validator::make($request->all(), [
+        $inputs = $request->all();
+        $inputs['url'] = $url;
+
+        $validator = Validator::make($inputs, [
             'url'     => 'required|string|url',
             'content' => 'required|string'
         ]);
@@ -33,7 +36,7 @@ class CommentController extends Controller
             ]), 400);
         }
 
-        $comment = Comment::create($request->all());
+        $comment = Comment::create($inputs);
 
         return response()->json(arrayView('phpsoft.comments::comment/read', [
             'comment' => $comment

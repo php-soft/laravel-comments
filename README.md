@@ -11,7 +11,7 @@ Install via composer - edit your `composer.json` to require the package.
 ```js
 "require": {
     // ...
-    "php-soft/laravel-comment": "dev-master",
+    "php-soft/laravel-comments": "dev-master",
 }
 ```
 
@@ -39,6 +39,11 @@ It will generate the migration files. You may now run it with the artisan migrat
 ```sh
 $ php artisan migrate
 ```
+You will want to publish the config using the following command:
+
+```sh
+$ php artisan vendor:publish --provider="PhpSoft\Comments\Providers\CommentServiceProvider"
+```
 
 
 
@@ -50,10 +55,17 @@ Add routes in `app/Http/routes.php`
 Route::group(['middleware'=>'auth'], function() {
 
     Route::get('/comments/{url}', '\PhpSoft\Comments\Controllers\CommentController@index')->where('url', '.*');
-    Route::post('/comments', '\PhpSoft\Comments\Controllers\CommentController@store');
+    Route::post('/comments/{url}', '\PhpSoft\Comments\Controllers\CommentController@store')->where('url', '.*');
     Route::patch('/comments/{id}', '\PhpSoft\Comments\Controllers\CommentController@update');
     Route::delete('/comments/{id}', '\PhpSoft\Comments\Controllers\CommentController@destroy');
 });
 ```
 
 ***You can remove middlewares if your application don't require check authenticate and permission!***
+
+## 3. Get comment's user
+Sometimes you need to get users' information while viewing other comments. You can easily use it by:
+
+```php
+$user = $comment->users();
+```
