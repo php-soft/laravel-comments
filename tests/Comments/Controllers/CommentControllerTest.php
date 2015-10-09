@@ -57,7 +57,7 @@ class CommentControllerTest extends TestCase
         $this->assertInternalType('array', $results->entities);
         $this->assertEquals('http://pm.greenglobal.vn/post1', $results->entities[0]->url);
         $this->assertEquals('demo comment', $results->entities[0]->content);
-        $this->assertEquals(Auth::user()->id, $results->entities[0]->user_id);
+        $this->assertEquals(Auth::user()->id, $results->entities[0]->userId);
     }
 
     public function testUpdateNotExists()
@@ -116,7 +116,7 @@ class CommentControllerTest extends TestCase
         $results = json_decode($res->getContent());
         $this->assertEquals($comment->content, $results->entities[0]->content);
         $this->assertEquals($comment->url, $results->entities[0]->url);
-        $this->assertEquals($comment->user_id, $results->entities[0]->user_id);
+        $this->assertEquals($comment->user_id, $results->entities[0]->userId);
     }
 
     public function testUpdateWithNewInformation()
@@ -133,7 +133,7 @@ class CommentControllerTest extends TestCase
         $results = json_decode($res->getContent());
         $this->assertEquals('new comment', $results->entities[0]->content);
         $this->assertEquals($comment->url, $results->entities[0]->url);
-        $this->assertEquals($comment->user_id, $results->entities[0]->user_id);
+        $this->assertEquals($comment->user_id, $results->entities[0]->userId);
     }
 
     public function testDeleteNotFound()
@@ -227,8 +227,10 @@ class CommentControllerTest extends TestCase
         $this->assertEquals(count($comments), count($results->entities));
         for ($i = 0; $i <= 10; ++$i) {
             $this->assertEquals($comments[10 - $i]->id, $results->entities[$i]->id);
+            $this->assertObjectHasAttribute('createdAt', $results->entities[$i]);
+            $this->assertObjectHasAttribute('updatedAt', $results->entities[$i]);
             $this->assertEquals('http://pm.greenglobal.vn/1', $results->entities[$i]->url);
-            $this->assertEquals('1', $results->entities[$i]->user_id);
+            $this->assertEquals('1', $results->entities[$i]->userId);
         }
     }
 
