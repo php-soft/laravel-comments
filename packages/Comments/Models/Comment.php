@@ -3,7 +3,7 @@
 namespace PhpSoft\Comments\Models;
 
 use Auth;
-use Illuminate\Database\Eloquent\Exception;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 
 class Comment extends Model
@@ -62,7 +62,7 @@ class Comment extends Model
 
     /**
      * Browse items
-     * 
+     *
      * @param  array  $options
      * @return array
      */

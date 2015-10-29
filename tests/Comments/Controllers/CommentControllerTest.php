@@ -89,7 +89,7 @@ class CommentControllerTest extends TestCase
         $this->assertEquals(403, $res->getStatuscode());
 
         // test input invalid
-        $comment = factory(Comment::class)->create(['user_id' => $user1->id]); 
+        $comment = factory(Comment::class)->create(['user_id' => $user1->id]);
 
         $res = $this->call('PATCH', '/comments/' . $comment->id, [
             'content'  => '',
@@ -179,7 +179,7 @@ class CommentControllerTest extends TestCase
     public function testBrowseNotFound()
     {
         // test not login
-        $urlencode = urlencode('http://pm.greenglobal.vn/post1'); 
+        $urlencode = urlencode('http://pm.greenglobal.vn/post1');
         $res = $this->call('GET', "/comments/$urlencode");
 
         $this->assertEquals(401, $res->getStatuscode());
@@ -188,9 +188,9 @@ class CommentControllerTest extends TestCase
         $user = factory(App\User::class)->create();
         Auth::login($user);
 
-        $urlencode = urlencode('http://pm.greenglobal.vn/post1'); 
+        $urlencode = urlencode('http://pm.greenglobal.vn/post1');
         $removeAllComments = Comment::truncate();
-        $res = $this->call('GET', "/comments/$urlencode"); 
+        $res = $this->call('GET', "/comments/$urlencode");
         $this->assertEquals(200, $res->getStatusCode());
         $results = json_decode($res->getContent());
         $this->assertEquals(0, count($results->entities));
